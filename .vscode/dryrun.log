@@ -1,0 +1,5 @@
+make all -f "/Users/jmm/Documents/git/ProjectMustang/makefile" --dry-run --keep-going --print-directory
+make: Entering directory `/Users/jmm/Documents/git/ProjectMustang'
+make: Nothing to be done for `all'.
+make: Leaving directory `/Users/jmm/Documents/git/ProjectMustang'
+ 
