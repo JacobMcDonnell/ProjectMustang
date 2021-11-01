@@ -1,7 +1,5 @@
 # Project Mustang
 
-***
-
 ## Overview: 
 
 A UNIX-like operating system with the graphical environment of a 90s operating system, written in C for the Raspberry PI 4.
