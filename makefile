@@ -1,4 +1,4 @@
-export (CC) = clang
+export (CC) = gcc
 #TOPTARGETS := all
 SUBDIRS := src
 export PROROOT := ${CURDIR}
@@ -8,7 +8,9 @@ export PROROOT := ${CURDIR}
 $(SUBDIRS):
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 
-all: $(SUBRIRS)
+all: build install
+
+build: $(SUBDIRS)
 
 install:
 	@rm -r /opt/ProjectMustang
@@ -17,4 +19,4 @@ install:
 clean: $(SUBDIRS)
 	@rm $(wildcard build/bin/*)
 
-.PHONY: install all clean $(TOPTARGETS) $(SUBDIRS)
+.PHONY: install build all clean $(TOPTARGETS) $(SUBDIRS)

@@ -1,4 +1,4 @@
-TOPTARGETS := all clean install
+TOPTARGETS := all build clean install
 
 SUBDIRS := $(wildcard */.)
 

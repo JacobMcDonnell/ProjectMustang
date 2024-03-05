@@ -1,10 +1,12 @@
-all: coin
+CFLAGS=-Wall -Werror
+
+build: coin
 	@cp coin $(PROROOT)/build/bin/coin
 
 coin: coin.c
-	$(CC) -o coin coin.c
+	$(CC) $(CFLAGS) -o coin coin.c
 
 clean:
 	@rm -r coin
 
-.PHONY: all clean
+.PHONY: build clean

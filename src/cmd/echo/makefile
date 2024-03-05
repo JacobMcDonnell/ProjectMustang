@@ -1,10 +1,12 @@
-all: echo
+CFLAGS=-Wall -Werror
+
+build: echo
 	@cp echo $(PROROOT)/build/bin/echo
 
 echo: echo.c
-	$(CC) -o echo echo.c
+	$(CC) $(CFLAGS) -o echo echo.c
 
 clean:
 	@rm -r echo
-	
-.PHONY: all clean
+
+.PHONY: build clean
