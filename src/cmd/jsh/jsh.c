@@ -3,12 +3,16 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdbool.h>
-#include <ctype.h>
+#include <fcntl.h>
+#include "builtin.h"
 
 size_t getargs(const size_t n, char *args[n], FILE * const stream);
 int shellexec(size_t n, char * const args[n]);
+/* int shellredirect(size_t n, char * const args[n], const char * const file, const int mode); */
+/* int shelltofile(size_t n, char * const args[n], const int fd); */
 
 static bool run = true;
+static const char * const delim = "\t\n &|><";
 
 int main(int argc, char *argv[]) {
 	char *words[BUFSIZ] = {NULL};
@@ -23,7 +27,7 @@ int main(int argc, char *argv[]) {
 	while (run) {
 		printf("$ ");
 		numberofwords = getargs(BUFSIZ, words, fp);
-		shellexec(BUFSIZ, words);
+		shellexec(numberofwords, words);
 		for (int i = 0; i < numberofwords; i++) {
 			free(words[i]);
 			words[i] = NULL;
@@ -33,33 +37,26 @@ int main(int argc, char *argv[]) {
 }
 
 size_t getargs(const size_t n, char *args[n], FILE * const stream) {
-	size_t i = 0;
-	char c = 0, s[BUFSIZ], *sp = s;
-	memset(s, '\0', sizeof(s));
-	while ((c = fgetc(stream)) != EOF && i < n && sp < s + BUFSIZ) {
-		if (isspace(c)) {
-			*sp = '\0';
-			args[i++] = strdup(s);
-			sp = s;
-			if (strcmp(args[i-1], "") == 0) {
-				free(args[i-1]);
-				args[i-1] = NULL;
-				i--;
-			}
-			if (c == '\n') {
-				break;
-			}
-		} else {
-			*sp++ = c;
+	char *line = (char *)malloc(BUFSIZ), *tofree, *token;
+	size_t linecap = 0, num = 0;
+	getline(&line, &linecap, stream);
+	tofree = line;
+	while ((token = strsep(&line, delim)) != NULL) {
+		if (strcmp(token, "") != 0) {
+			args[num++] = strdup(token);
 		}
 	}
-	return i;
+	free((void *)tofree);
+	return num;
 }
 
-int shellexec(size_t n, char * const args[n]) {
+int shellexec(const size_t n, char * const args[n]) {
+	int index;
 	if (strcmp(args[0], "exit") == 0) {
 		run = false;
-		return 0;
+		return EXIT_SUCCESS;
+	} else if ((index = checkbuiltin(args[0])) != -1) {
+		return execbuiltin(index, n, args);
 	}
 	pid_t pid = fork();
 	int status;
@@ -76,6 +73,42 @@ int shellexec(size_t n, char * const args[n]) {
 		  waitpid(pid, &status, WUNTRACED);
 		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }
 
+
+/* int shellredirect(size_t n, char * const args[n], const char * const file, const int mode) { */
+/* 	int fd = open(file, mode); */
+/* 	int status; */
+/* 	if (mode & O_WRONLY || mode & O_APPEND) { */
+/* 		status = shelltofile(n, args, fd); */
+/* 	} else if (mode & O_RDONLY) { */
+/* 		status = EXIT_FAILURE; */
+/* 	} else { */
+/* 		status = EXIT_FAILURE; */
+/* 	} */
+/* 	close(fd); */
+/* 	return status; */
+/* } */
+
+/* int shelltofile(size_t n, char * const args[n], const int fd) { */
+/* 	pid_t pid = fork(); */
+/* 	int status; */
+/* 	if (pid == 0) { */
+/* 		close(STDOUT_FILENO); */
+/* 		dup2(fd, STDOUT_FILENO); */
+/* 		if (execvp(args[0], args) == -1) { */
+/* 			perror("jsh"); */
+/* 			exit(EXIT_FAILURE); */
+/* 		} */
+/* 		exit(EXIT_SUCCESS); */
+/* 	} else if (pid < 0) { */
+/* 		perror("jsh"); */
+/* 		exit(EXIT_FAILURE); */
+/* 	} else { */
+/* 		do { */
+/* 		  waitpid(pid, &status, WUNTRACED); */
+/* 		} while (!WIFEXITED(status) && !WIFSIGNALED(status)); */
+/* 	} */
+/* 	return EXIT_SUCCESS; */
+/* } */
