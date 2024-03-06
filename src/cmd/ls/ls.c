@@ -25,12 +25,6 @@ int main(int argc, char **argv)
 			return -1;
 		}
 		dirwalk(dp);
-	} else if (argc == 2) {
-		if ((dp = opendir(argv[1])) == NULL) {
-			perror("ls");
-			return -1;
-		}
-		dirwalk(dp);
 	} else {
 		while (--argc > 0 && !ferror(stdout)) {
 			errno = 0;
