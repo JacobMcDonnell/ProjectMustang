@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Werror
+CFLAGS=-Wall -Werror -g
 
 build: rm
 	@cp rm $(PROROOT)/build/bin/rm

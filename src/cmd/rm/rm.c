@@ -77,7 +77,7 @@ int rm(char *path) {
 			return -1;
 		}
 	} else if (S_ISDIR(sbuf.st_mode)) {
-		warnc(EISDIR, "%s", path);
+		fprintf(stderr, "rm: %s: %s\n", path, strerror(EISDIR));
 		return -1;
 	} else {
 		if (unlink(path) != 0) {
@@ -101,9 +101,10 @@ int removedir(const char * const path) {
 			size_t len = strlen(path) + strlen(name) + 3;
 			char *newpath = (char *)malloc(len);
 			if (newpath == NULL) {
+				perror("rm");
 				exit(EXIT_FAILURE);
 			}
-			strncat(newpath, path, len);
+			strncpy(newpath, path, len);
 			strncat(newpath, "/", (len -= strlen(path)));
 			strncat(newpath, name, --len);
 			status = rm(newpath);
