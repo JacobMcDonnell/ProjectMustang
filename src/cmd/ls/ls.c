@@ -25,6 +25,7 @@ int main(int argc, char **argv)
 			return -1;
 		}
 		dirwalk(dp);
+		closedir(dp);
 	} else {
 		while (--argc > 0 && !ferror(stdout)) {
 			errno = 0;
@@ -33,6 +34,7 @@ int main(int argc, char **argv)
 				continue;
 			}
 			dirwalk(dp);
+			closedir(dp);
 		}
 	}
 }
@@ -50,6 +52,7 @@ void dirwalk(DIR *d)
 	if (errno != 0) {
 		perror("ls");
 	}
+	free((void *)dir);
 }
 
 /* printdirent: print a directory entry and any selected information */
